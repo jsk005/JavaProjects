@@ -1,0 +1,1 @@
+Java 기반 activity간의 UI 이동에 대한 코드 설명이다.
