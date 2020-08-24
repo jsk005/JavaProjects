@@ -1,1 +1,4 @@
 Java 기반 activity간의 UI 이동에 대한 코드 설명이다.
+A activity 에서 B activity 로 이동하고, 다시 되돌아가기를 하면 A activity로 이동,
+C activity 에서 B activity 로 이동하고, 다시 되돌아가기를 하면 C activity로 이동
+하는 즉 하나의 B activity에 값을 약간씩 다르게 저장하면서 A activity, C activity 각각으로 이동하는 코드가 필요한 경우에 유용한 코드를 포함시켰다.
