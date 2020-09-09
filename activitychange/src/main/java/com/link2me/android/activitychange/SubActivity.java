@@ -41,12 +41,14 @@ public class SubActivity extends AppCompatActivity implements View.OnClickListen
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.btntoMain:
+                // 일반적인 Activity 간 이동
                 Intent mainintent = new Intent(SubActivity.this,MainActivity.class);
                 startActivity(mainintent);
                 finish();
                 break;
 
             case R.id.btntoTarget:
+                // 일반적인 Activity 간 이동
                 Intent intentTarget = new Intent(mContext, TargetActivity.class);
                 intentTarget.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 intentTarget.putExtra("classname",ClassName);

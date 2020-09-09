@@ -33,25 +33,26 @@ public class MainActivity extends AppCompatActivity {
         textView.setText("메인화면");
 
         btn2Target = findViewById(R.id.mainbutton);
-        btn2Target.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
+        btn2Target.setOnClickListener(view -> {
 
-                Intent intent = new Intent(MainActivity.this,TargetActivity.class);
-                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                intent.putExtra("classname",ClassName);
-                startActivity(intent);
-            }
+            Intent intent = new Intent(MainActivity.this,TargetActivity.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            intent.putExtra("classname",ClassName);
+            startActivity(intent);
         });
 
         Button btn2Sub = findViewById(R.id.btntoSub);
-        btn2Sub.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(MainActivity.this,SubActivity.class);
-                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                startActivity(intent);
-            }
+        btn2Sub.setOnClickListener(view -> {
+            Intent intent = new Intent(MainActivity.this,SubActivity.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            startActivity(intent);
+        });
+
+        findViewById(R.id.btn_interface).setOnClickListener(view -> Changer.saveData(mContext,OtherActivity.class));
+
+        findViewById(R.id.btn_move_activity).setOnClickListener(view -> {
+            ActivityChanger changer = new ActivityChanger();
+            changer.saveData(mContext,OtherActivity.class);
         });
     }
 
