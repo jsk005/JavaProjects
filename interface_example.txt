@@ -1,0 +1,2 @@
+Java 기반 Interface를 이해하기 위해 정리한 샘플코드이다.
+SMS authentication with One Time Password 처리를 위한 Custom Dialog 예제도 포함되어 있다.
