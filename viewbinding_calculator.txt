@@ -1,0 +1,2 @@
+ㅇ모던 안드로이드 View Bindg 기능
+ㅇ계산기 예제로 View Binding 기능을 테스트한다.
