@@ -1,4 +1,15 @@
 <resources>
     <string name="app_name">Recyclerview</string>
     <string name="Search">검색</string>
+    <string name="title_recyclerview">리스트</string>
+    <string name="title_dashboard">지도</string>
+    <string name="title_notifications">공지</string>
+    <string name="title_profile">프로필</string>
+    <string name="maps_api_key">AIzaSyDss4ZWk8EE4gfbPdRQbSgpcrp9p9P6PLw</string>
+    <string name="title_activity_viewpager">ViewpagerActivity</string>
+    <!--
+    This string is used for square devices and overridden by hello_world in
+    values-round/strings.xml for round devices.
+    -->
+    <string name="hello_world">Hello Square World!</string>
 </resources>

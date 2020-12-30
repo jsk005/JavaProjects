@@ -1,26 +1,32 @@
-package com.link2me.android.recyclerview;
+package com.link2me.android.recyclerview.fragment;
 
-import android.content.Context;
+import android.app.Activity;
 import android.content.DialogInterface;
 import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.Button;
+import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.ImageButton;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SearchView;
 import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.link2me.android.common.APIRequest;
-import com.link2me.android.common.BackPressHandler;
 import com.link2me.android.common.Utils;
-import com.link2me.android.recyclerview.adapter.RecyclerViewAdapter;
+import com.link2me.android.recyclerview.HangulUtils;
+import com.link2me.android.recyclerview.R;
+import com.link2me.android.recyclerview.Value;
+import com.link2me.android.recyclerview.adapter.FragmentRecyclerViewAdapter;
 import com.link2me.android.recyclerview.model.AddressResult;
 import com.link2me.android.recyclerview.model.Address_Item;
 import com.link2me.android.recyclerview.model.RemoteService;
@@ -32,31 +38,79 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class MainActivity extends AppCompatActivity implements RecyclerViewAdapter.OnItemClickListener{
+public class RecyclerViewFragment extends Fragment implements FragmentRecyclerViewAdapter.OnItemClickListener {
     private final String TAG = this.getClass().getSimpleName();
-    Context mContext;
+    private FragmentActivity mContext;
+
+    View rootview;
+    ImageButton btn_cancel;
+    ImageButton btn_send;
 
     private ArrayList<Address_Item> addressItemList = new ArrayList<>(); // 서버 전체 데이터 리스트
     private ArrayList<Address_Item> searchItemList = new ArrayList<>(); // 검색한 데이터 리스트
     private RecyclerView mRecyclerView;
-    private RecyclerViewAdapter mAdapter;
+    private FragmentRecyclerViewAdapter mAdapter;
     private SearchView editsearch;
 
     RemoteService remoteService;
 
-    public static ConstraintLayout constraintLayout;
+    public static ConstraintLayout fragconstraintLayout;
     public static boolean isCheckFlag = false;
     public CheckBox checkAll;
 
-    private BackPressHandler backPressHandler;
+    private static final String ARG_PARAM1 = "param1";
+    private static final String ARG_PARAM2 = "param2";
+
+    private String mParam1;
+    private String mParam2;
+
+    public RecyclerViewFragment() {
+    }
+
+    public static RecyclerViewFragment newInstance(String param1, String param2) {
+        RecyclerViewFragment fragment = new RecyclerViewFragment();
+        Bundle args = new Bundle();
+        args.putString(ARG_PARAM1, param1);
+        args.putString(ARG_PARAM2, param2);
+        fragment.setArguments(args);
+        return fragment;
+    }
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-        mContext = MainActivity.this;
-        backPressHandler = new BackPressHandler(this);
+    public void onAttach(Activity activity) { // Fragment 가 Activity에 attach 될 때 호출된다.
+        super.onAttach(activity);
+        mContext =(FragmentActivity) activity;
+    }
 
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        if (getArguments() != null) {
+            mParam1 = getArguments().getString(ARG_PARAM1);
+            mParam2 = getArguments().getString(ARG_PARAM2);
+        }
+    }
+
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        rootview = inflater.inflate(R.layout.fragment_recyclerview, container, false);
+        return rootview;
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        // Set the Recycler View adapter
+        mRecyclerView = rootview.findViewById(R.id.address_listview_rcv);
+        fragconstraintLayout = rootview.findViewById(R.id.listview_fragment2);
+        editsearch = rootview.findViewById(R.id.search_rcv);
+        checkAll = rootview.findViewById(R.id.lv_checkbox_all_rcv);
+        btn_cancel = rootview.findViewById(R.id.btn_cancel_rcv);
+        btn_send = rootview.findViewById(R.id.btn_send_rcv);
+    }
+
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
         initView();
     }
 
@@ -82,7 +136,7 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewAdapt
                         searchItemList.add(item);
                     }
                     // runOnUiThread()를 호출하여 실시간 갱신한다.
-                    runOnUiThread(() -> {
+                    getActivity().runOnUiThread(() -> {
                         // 갱신된 데이터 내역을 어댑터에 알려줌
                         mAdapter.notifyDataSetChanged();
                     });
@@ -100,25 +154,23 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewAdapt
     }
 
     private void buildRecyclerView(){
-        mRecyclerView = findViewById(R.id.address_listview);
+
         mRecyclerView.setHasFixedSize(true);
         LinearLayoutManager manager = new LinearLayoutManager(mContext);
-        mAdapter = new RecyclerViewAdapter(mContext,searchItemList); // 객체 생성
+        mAdapter = new FragmentRecyclerViewAdapter(mContext,searchItemList); // 객체 생성
 
         DividerItemDecoration decoration = new DividerItemDecoration(mContext,manager.getOrientation());
         mRecyclerView.addItemDecoration(decoration);
         mRecyclerView.setLayoutManager(manager);
         mRecyclerView.setAdapter(mAdapter);
 
-        mAdapter.setOnItemSelectClickListener(this);
+        mAdapter.setOnItemChoiceClickListener(this);
     }
 
     private void setButtons(){
         isCheckFlag = false;
-        constraintLayout = findViewById(R.id.listview_constraint2);
 
         // Locate the EditText in listview_main.xml
-        editsearch = findViewById(R.id.search);
         editsearch.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
@@ -136,13 +188,12 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewAdapt
         });
 
         if (isCheckFlag == false) {
-            constraintLayout.setVisibility(View.GONE);
+            fragconstraintLayout.setVisibility(View.GONE);
         } else if (isCheckFlag == true) {
-            constraintLayout.setVisibility(View.VISIBLE);
+            fragconstraintLayout.setVisibility(View.VISIBLE);
         }
 
         // all checkbox
-        checkAll = findViewById(R.id.lv_checkbox_all);
         checkAll.setOnCheckedChangeListener((buttonView, isChecked) -> {
             if (checkAll.isChecked() == true) {
                 mAdapter.selectAll();
@@ -153,38 +204,32 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewAdapt
             }
         });
 
-        ImageButton cancel = findViewById(R.id.btn_cancel);
-        cancel.setOnClickListener(v -> {
+        btn_cancel.setOnClickListener(v -> {
             isCheckFlag = false;
-            constraintLayout.setVisibility(View.GONE);
+            fragconstraintLayout.setVisibility(View.GONE);
             mAdapter.unselectall();
             checkAll.setChecked(false); // 전체 선택 체크박스 해제
             mAdapter.notifyDataSetChanged();
         });
 
-        ImageButton send = findViewById(R.id.btn_send);
         final String[] listview_items = {"그룹문자 보내기", "연락처 저장"};
-        final AlertDialog.Builder items_builder = new AlertDialog.Builder(MainActivity.this);
+        final AlertDialog.Builder items_builder = new AlertDialog.Builder(mContext);
         items_builder.setTitle("해당 작업을 선택하세요");
         items_builder.setItems(listview_items, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 switch (which) {
                     case 0:
-                        Toast.makeText(getApplicationContext(), "그룹문자 보내기 구현하세요.", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getActivity(), "그룹문자 보내기 구현하세요.", Toast.LENGTH_SHORT).show();
                         break;
                     case 1:
-                        Toast.makeText(getApplicationContext(), "연락처 저장을 구현하세요.", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getActivity(), "연락처 저장을 구현하세요.", Toast.LENGTH_SHORT).show();
                         break;
                 }
             }
         });
         items_builder.create();
-
-        send.setOnClickListener(v ->
-
-                items_builder.show());
-
+        btn_send.setOnClickListener(v -> items_builder.show());
     }
 
     // Filter Class
@@ -211,11 +256,6 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewAdapt
             }
         }
         mAdapter.notifyDataSetChanged();
-    }
-
-    @Override
-    public void onBackPressed() {
-        backPressHandler.onBackPressed();
     }
 
     @Override

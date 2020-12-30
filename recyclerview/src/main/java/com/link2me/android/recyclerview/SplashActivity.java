@@ -24,7 +24,8 @@ public class SplashActivity extends AppCompatActivity {
     Handler handler = new Handler();
     private int SPLASH_TIME_OUT = 2000;
     private Runnable runnable = () -> {
-        Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+        Intent intent = new Intent(getApplicationContext(), ViewpagerActivity.class);
+        //Intent intent = new Intent(getApplicationContext(), MainActivity.class);
         startActivity(intent);
         finish();
     };
@@ -58,7 +59,9 @@ public class SplashActivity extends AppCompatActivity {
                     .setDeniedMessage("앱에서 요구하는 권한설정이 필요합니다...\n [설정] > [권한] 에서 사용으로 활성화해주세요.")
                     .setPermissions(new String[]{
                             android.Manifest.permission.READ_PHONE_STATE,
-                            android.Manifest.permission.CALL_PHONE  // 전화걸기 및 관리
+                            android.Manifest.permission.CALL_PHONE,  // 전화걸기 및 관리
+                            android.Manifest.permission.ACCESS_FINE_LOCATION,
+                            android.Manifest.permission.ACCESS_COARSE_LOCATION
                     })
                     .check();
 
