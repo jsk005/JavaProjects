@@ -21,12 +21,19 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
     private final String TAG = this.getClass().getSimpleName();
     private List<NewsData> mDataset;
 
+    // 커스텀 리스너 구현 /////////////////////////////////////////////
+    private OnItemClickListener mListener;
+    public void setOnItemClickListener(OnItemClickListener listener){
+        mListener = listener;
+    }
+    //////////////////////////////////////////////////////////////////
+
     public RecyclerViewAdapter(Context context, List<NewsData> myDataset) {
         mDataset = myDataset;
         Fresco.initialize(context);
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder{
+    public class ViewHolder extends RecyclerView.ViewHolder {
         public TextView TextView_title;
         public TextView TextView_content;
         public SimpleDraweeView ImageView_title;
@@ -36,6 +43,16 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
             TextView_title = itemView.findViewById(R.id.TextView_title);
             TextView_content = itemView.findViewById(R.id.TextView_content);
             ImageView_title = itemView.findViewById(R.id.ImageView_title);
+
+            itemView.setOnClickListener(v -> {
+                int pos = getAdapterPosition();
+                if (pos != RecyclerView.NO_POSITION) {
+                    if(mListener != null){
+                        mListener.onItemClick(v,pos);
+                        notifyItemChanged(pos);
+                    }
+                }
+            });
         }
     }
 

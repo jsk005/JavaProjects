@@ -1,8 +1,10 @@
 package com.cookandroid.itswnews;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.DividerItemDecoration;
@@ -27,7 +29,7 @@ public class MainActivity extends AppCompatActivity {
     Context mContext;
 
     private RecyclerView mRecyclerView;
-    private RecyclerView.Adapter mAdapter;
+    private RecyclerViewAdapter mAdapter;
     private ArrayList<NewsData> newsList = new ArrayList<>(); // 데이터 리스트
     private String[] mDataset = {"1","2","3","4","5","6","7","8"};
 
@@ -55,11 +57,21 @@ public class MainActivity extends AppCompatActivity {
         mRecyclerView.setAdapter(mAdapter);
 
         sendAndRequestResponse();
+
+        mAdapter.setOnItemClickListener(new OnItemClickListener() {
+            @Override
+            public void onItemClick(View view, int position) {
+                Intent intent = new Intent(mContext, Newsview.class);
+                intent.putExtra("NEWS_URL", newsList.get(position).getUrl());
+                startActivity(intent);
+            }
+        });
+
     }
 
     private void sendAndRequestResponse() {
         //String url ="http://newsapi.org/v2/top-headlines?country=kr&category=science&apiKey=675a48efa82b4e418bbe95f58fa9f02d";
-        String url ="http://test.abc.com/_sample/getURLJSON.php";
+        String url ="https://www.abc.com/_sample/getURLJSON.php";
 
         //RequestQueue initialized
         mRequestQueue = Volley.newRequestQueue(this);
@@ -95,6 +107,7 @@ public class MainActivity extends AppCompatActivity {
                 newsData.setTitle(obj.getString("title"));
                 newsData.setUrlToImage(obj.getString("urlToImage"));
                 newsData.setDescription(obj.getString("description"));
+                newsData.setUrl(obj.getString("url"));
                 newsList.add(newsData);
             }
             // runOnUiThread()를 호출하여 실시간 갱신한다.
