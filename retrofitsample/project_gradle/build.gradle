@@ -1,0 +1,32 @@
+// Top-level build file where you can add configuration options common to all sub-projects/modules.
+buildscript {
+    ext.kotlin_version = '1.6.21'
+    ext.anko_version = '0.10.8'
+
+    repositories {
+        google()
+        jcenter()
+        maven { url 'https://dl.bintray.com/kotlin/kotlin-eap' }
+    }
+    dependencies {
+        classpath 'com.android.tools.build:gradle:7.0.4'
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+        // 위치 정보를 제공받고자 하는 경우
+        classpath 'com.google.gms:google-services:4.3.10'
+    }
+}
+
+allprojects {
+    repositories {
+        google()
+        jcenter()
+        maven { url 'https://jitpack.io' }
+        // 네이버 지도 저장소
+//        maven { url 'https://navercorp.bintray.com/maps' }
+        maven { url "https://naver.jfrog.io/artifactory/maven/" }
+    }
+}
+
+task clean(type: Delete) {
+    delete rootProject.buildDir
+}
