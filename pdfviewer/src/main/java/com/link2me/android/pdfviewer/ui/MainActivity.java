@@ -51,7 +51,7 @@ public class MainActivity extends AppCompatActivity implements BindPdfViewListAd
     private ArrayList<Pdf_Item> pdfItemList = new ArrayList<>();
     private BindPdfViewListAdapter mAdapter;
 
-    DownloadPdfFromURL downloadApk;
+    DownloadPdfFromURL dnPdf;
     private File outputFile;
 
     private BackPressHandler backPressHandler;
@@ -121,15 +121,15 @@ public class MainActivity extends AppCompatActivity implements BindPdfViewListAd
     @Override
     public void onItemClicked(View view, Pdf_Item item, int position) {
 //        Log.d(TAG, RetrofitUrl.BASE_URL+item.getPdfurl());
-        Toast.makeText(getApplicationContext(), "잠시 기다리시면 PDF 파일 열람이 가능합니다", Toast.LENGTH_LONG).show();
+        Toast.makeText(getApplicationContext(), "잠시 기다리시면 "+item.getTitle()+" PDF 파일 열람이 가능합니다", Toast.LENGTH_LONG).show();
         String PDFUrl = RetrofitUrl.BASE_URL+item.getPdfurl();
         downloadPDF(PDFUrl);
     }
 
     private void downloadPDF(String fileUrl) {
         // 백그라운드 객체를 만들어 주어야 다운로드 취소가 제대로 동작됨
-        downloadPdf = new DownloadPdfFromURL();
-        downloadPdf.execute(fileUrl);
+        dnPdf = new DownloadPdfFromURL();
+        dnPdf.execute(fileUrl);
     }
 
     class DownloadPdfFromURL extends AsyncTask<String, Integer, String> {
@@ -162,7 +162,6 @@ public class MainActivity extends AppCompatActivity implements BindPdfViewListAd
                 while ((count = input.read(data)) != -1) {
                     if (isCancelled()) {
                         input.close();
-                        //return String.valueOf(-1);
                     }
                     total = total + count;
                     if (lenghtOfFile > 0) { // 파일 총 크기가 0 보다 크면
@@ -222,11 +221,9 @@ public class MainActivity extends AppCompatActivity implements BindPdfViewListAd
     }
 
     void openPDF(File file) {
-		// AndroidManifest.xml 파일 내 <provider ...> 부분과 관련있다
         Uri fileUri = FileProvider.getUriForFile(mContext, mContext.getApplicationContext().getPackageName() + ".fileprovider",file);
 
-        // PDF 파일을 읽자마자 바로 보여진다.
-		Intent intent = new Intent(Intent.ACTION_VIEW);
+        Intent intent = new Intent(Intent.ACTION_VIEW);
         intent.setDataAndType(fileUri, "application/pdf");
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
         intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
