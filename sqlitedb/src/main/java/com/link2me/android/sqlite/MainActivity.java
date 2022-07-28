@@ -34,8 +34,8 @@ import com.bumptech.glide.Glide;
 import com.link2me.android.common.BackPressHandler;
 import com.link2me.android.common.HangulUtils;
 import com.link2me.android.common.Utils;
-import com.link2me.android.sqlite.localdb.ContactContract;
-import com.link2me.android.sqlite.localdb.ContactDbFacade;
+import com.link2me.android.sqlite.localdb.DBContract;
+import com.link2me.android.sqlite.localdb.DbFacade;
 import com.link2me.android.sqlite.model.Address_Item;
 import com.link2me.android.sqlite.model.SQLite_Item;
 
@@ -63,7 +63,7 @@ public class MainActivity extends AppCompatActivity {
 
     private BackPressHandler backPressHandler;
 
-    private ContactDbFacade mFacade;
+    private DbFacade mFacade;
     HashMap<String, SQLite_Item> sqliteDBMap = new HashMap<String, SQLite_Item>();
     ArrayList<String> aryIdx = new ArrayList<String>();
     ArrayList<String> aryName = new ArrayList<String>();
@@ -76,7 +76,7 @@ public class MainActivity extends AppCompatActivity {
         mContext = MainActivity.this;
         backPressHandler = new BackPressHandler(this); // 뒤로 가기 버튼 이벤트
 
-        mFacade = new ContactDbFacade(mContext);
+        mFacade = new DbFacade(mContext);
 
         SQLiteDB2ArrayList();
         initView();
@@ -120,20 +120,22 @@ public class MainActivity extends AppCompatActivity {
 
             try {
                 JSONObject jsonObj = new JSONObject(response);
-                peoples = jsonObj.getJSONArray(ContactContract._RESULTS);
+                peoples = jsonObj.getJSONArray(DBContract._RESULTS);
 
                 addressItemList.clear(); // 서버에서 가져온 데이터 초기화
                 for (int i = 0; i < peoples.length(); i++) {
                     JSONObject c = peoples.getJSONObject(i);
-                    final String idx = c.getString(ContactContract.Entry._IDX);
-                    final String name = c.getString(ContactContract.Entry._NAME);
-                    final String mobileNO = c.getString(ContactContract.Entry._MobileNO);
-                    final String officeNO = c.getString(ContactContract.Entry._telNO);
+                    final String idx = c.getString(DBContract.Entry._IDX);
+                    final String name = c.getString(DBContract.Entry._NAME);
+                    final String mobileNO = c.getString(DBContract.Entry._MobileNO);
+                    final String officeNO = c.getString(DBContract.Entry._telNO);
                     final String Team = "";
                     final String Mission = "";
                     final String Position = "";
-                    String PhotoImage = c.getString(ContactContract.Entry._Photo);
+                    String PhotoImage = c.getString(DBContract.Entry._Photo);
                     final String Status = "1";
+
+                    Log.e(TAG,"name : " + name);
 
                     // 서버에서 가져온 데이터 저장
                     getServerDataList(idx, name, mobileNO, officeNO, PhotoImage, false);

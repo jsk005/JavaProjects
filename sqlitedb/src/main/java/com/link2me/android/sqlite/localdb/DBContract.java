@@ -2,14 +2,14 @@ package com.link2me.android.sqlite.localdb;
 
 import android.provider.BaseColumns;
 
-public final class ContactContract {
+public final class DBContract {
     // 서버 정보를 파싱하기 위한 변수 선언
     public static final String _RESULTS ="result";
     // 전화 수신
     public static final String _CallingNO = "callingNO";
     public static final String _CallingTime = "received_time";
 
-    private ContactContract() {
+    private DBContract() {
     }
 
     public static class Entry implements BaseColumns {
