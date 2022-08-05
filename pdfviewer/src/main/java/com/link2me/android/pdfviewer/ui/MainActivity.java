@@ -8,6 +8,7 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
@@ -38,6 +39,18 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
 
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
+import io.reactivex.rxjava3.annotations.NonNull;
+import io.reactivex.rxjava3.core.Observable;
+import io.reactivex.rxjava3.core.ObservableEmitter;
+import io.reactivex.rxjava3.core.ObservableOnSubscribe;
+import io.reactivex.rxjava3.core.Observer;
+import io.reactivex.rxjava3.disposables.Disposable;
+import io.reactivex.rxjava3.functions.Function;
+import io.reactivex.rxjava3.schedulers.Schedulers;
+import okhttp3.ResponseBody;
+import okio.BufferedSink;
+import okio.Okio;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -120,10 +133,11 @@ public class MainActivity extends AppCompatActivity implements BindPdfViewListAd
 
     @Override
     public void onItemClicked(View view, Pdf_Item item, int position) {
-//        Log.d(TAG, RetrofitUrl.BASE_URL+item.getPdfurl());
+        Log.e(TAG, item.getPdfurl());
         Toast.makeText(getApplicationContext(), "잠시 기다리시면 "+item.getTitle()+" PDF 파일 열람이 가능합니다", Toast.LENGTH_LONG).show();
         String PDFUrl = RetrofitUrl.BASE_URL+item.getPdfurl();
-        downloadPDF(PDFUrl);
+        //downloadPDF(PDFUrl);
+        downloadPDFFile(item.getPdfurl());
     }
 
     private void downloadPDF(String fileUrl) {
@@ -238,4 +252,79 @@ public class MainActivity extends AppCompatActivity implements BindPdfViewListAd
     public void onBackPressed() {
         backPressHandler.onBackPressed();
     }
+
+    public void downloadPDFFile(String fileUrl) {
+        RetrofitService downloadService = RetrofitAdapter.createService(RetrofitService.class);
+        downloadService.downloadFile(fileUrl)
+                .flatMap(processResponse())
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(handleResult());
+    }
+
+    public Function<Response<ResponseBody>, Observable<File>> processResponse(){
+        return new Function<Response<ResponseBody>, Observable<File>>() {
+            @Override
+            public Observable<File> apply(Response<ResponseBody> responseBodyResponse) throws Exception {
+                return saveToDiskRx(responseBodyResponse);
+            }
+        };
+    }
+
+    private Observable<File> saveToDiskRx(final Response<ResponseBody> response){
+        return Observable.create(new ObservableOnSubscribe<File>() {
+            @Override
+            public void subscribe(@NonNull ObservableEmitter<File> subscriber) throws Throwable {
+                File filePath = new File(Environment.getExternalStorageDirectory() + "/download");
+                outputFile = new File(filePath, "tempPDF.pdf");
+                if (outputFile.exists()) { // 기존 파일 존재시 삭제하고 다운로드
+                    outputFile.delete();
+                }
+
+                BufferedSink bufferedSink = Okio.buffer(Okio.sink(outputFile));
+                bufferedSink.writeAll(response.body().source());
+                bufferedSink.close();
+
+                subscriber.onNext(outputFile);
+                subscriber.onComplete();
+            }
+        });
+    }
+
+    private Observer<File> handleResult() {
+        return new Observer<File>() {
+
+            @Override
+            public void onSubscribe(@NonNull Disposable d) {
+                Log.d(TAG, "OnSubscribe");
+            }
+
+            @Override
+            public void onNext(@NonNull File file) {
+                Log.d(TAG, "File downloaded to " + file.getAbsolutePath());
+                // 다운로드한 파일 실행하여 업그레이드 진행하는 코드
+                if (Build.VERSION.SDK_INT >= 24) {
+                    openPDF(file);
+                } else {
+                    Intent intent = new Intent(Intent.ACTION_VIEW);
+                    Uri apkUri = Uri.fromFile(file);
+                    intent.setDataAndType(apkUri, "application/pdf");
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    getApplicationContext().startActivity(intent);
+                }
+            }
+
+            @Override
+            public void onError(@NonNull Throwable e) {
+                e.printStackTrace();
+                Log.d(TAG, "Error " + e.getMessage());
+            }
+
+            @Override
+            public void onComplete() {
+                Log.d(TAG, "onCompleted");
+            }
+        };
+    }
+
 }
