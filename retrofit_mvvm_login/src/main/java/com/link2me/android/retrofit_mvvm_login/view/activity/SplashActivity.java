@@ -15,11 +15,11 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.gun0912.tedpermission.PermissionListener;
-import com.gun0912.tedpermission.TedPermission;
+import com.gun0912.tedpermission.normal.TedPermission;
 import com.link2me.android.common.Utils;
 import com.link2me.android.retrofit_mvvm_login.databinding.ActivitySplashBinding;
 
-import java.util.ArrayList;
+import java.util.List;
 
 public class SplashActivity extends AppCompatActivity {
     private final String TAG = this.getClass().getSimpleName();
@@ -36,7 +36,7 @@ public class SplashActivity extends AppCompatActivity {
         }
 
         @Override
-        public void onPermissionDenied(ArrayList<String> deniedPermissions) {
+        public void onPermissionDenied(List<String> deniedPermissions) {
             Toast.makeText(SplashActivity.this, "권한 허용을 하지 않으면 서비스를 이용할 수 없습니다.", Toast.LENGTH_SHORT).show();
         }
     };
@@ -55,13 +55,13 @@ public class SplashActivity extends AppCompatActivity {
 
     private void checkPermissions() {
         if (Build.VERSION.SDK_INT >= 23) { // 마시멜로(안드로이드 6.0) 이상 권한 체크
-            TedPermission.with(mContext)
+            TedPermission.create()
                     .setPermissionListener(permissionlistener)
                     .setRationaleMessage("앱을 이용하기 위해서는 접근 권한이 필요합니다")
                     .setDeniedMessage("앱에서 요구하는 권한설정이 필요합니다...\n [설정] > [권한] 에서 사용으로 활성화해주세요.")
-                    .setPermissions(new String[]{
+                    .setPermissions(
                             android.Manifest.permission.READ_PHONE_STATE
-                    })
+                    )
                     .check();
 
         } else {
