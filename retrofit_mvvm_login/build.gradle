@@ -28,6 +28,12 @@ android {
         targetCompatibility JavaVersion.VERSION_1_8
     }
 
+    // kotlin 파일과 java 파일을 분리하여 구성하고자 한다면 추가하고
+    // 기본 java 파일에 같이 저장되도록 하려면 추가하지 않아도 된다.
+    sourceSets {
+        main.java.srcDirs += 'src/main/kotlin'
+    }
+
     // View Binding : Android Studio 4.0 이상
     buildFeatures {
         viewBinding = true
@@ -36,7 +42,9 @@ android {
 }
 
 dependencies {
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version" // 코틀린 혼용 사용을 위해 추가
+    // 아래 2줄은 코틀린 혼용 사용을 위해 추가
+    implementation 'androidx.core:core-ktx:1.8.0' // 2022년 6월 1일 버전
+    implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
 
     implementation 'androidx.appcompat:appcompat:1.4.2'
     implementation 'com.google.android.material:material:1.6.1'
@@ -45,7 +53,7 @@ dependencies {
 //    implementation 'gun0912.ted:tedpermission:2.2.3'  // 위험권한 퍼미션 처리
     implementation 'io.github.ParkSangGwon:tedpermission-normal:3.3.0'
     implementation 'androidx.cardview:cardview:1.0.0'  // 레이아웃으로 사용할 CardView
-    implementation 'androidx.recyclerview:recyclerview:1.1.0'
+    implementation 'androidx.recyclerview:recyclerview:1.2.1'
 
     implementation 'androidx.navigation:navigation-fragment:2.1.0'
     implementation 'androidx.navigation:navigation-ui:2.1.0'
