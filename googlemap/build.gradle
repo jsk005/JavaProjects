@@ -1,0 +1,70 @@
+plugins {
+    id 'com.android.application'
+    // 코틀린 혼용 사용을 위해 추가
+    id 'kotlin-android'
+    id 'kotlin-parcelize'
+    id 'kotlin-kapt'
+
+    // local.properties 에 구글맵 KEY를 저장하고 싶을 때 아래 한줄과 project build.gradle 에 추가해야 한다.
+    id 'com.google.android.libraries.mapsplatform.secrets-gradle-plugin'
+
+    // https://developers.google.com/maps/documentation/android-sdk/secrets-gradle-plugin?hl=ko 참고
+}
+
+android {
+    compileSdk 32
+
+    defaultConfig {
+        applicationId "com.link2me.android.googlemap"
+        minSdk 23
+        targetSdk 32
+        versionCode 1
+        versionName "1.0"
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    // View Binding : Android Studio 4.0 이상
+    buildFeatures {
+        viewBinding = true
+        //compose true // 코틀린에서만 사용 가능
+    }
+}
+
+dependencies {
+    // 아래 2줄은 코틀린 혼용 사용을 위해 추가
+    implementation 'androidx.core:core-ktx:1.8.0' // 2022년 6월 1일 버전
+    implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
+
+    implementation 'androidx.appcompat:appcompat:1.5.0'
+    implementation 'com.google.android.material:material:1.6.1'
+    implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
+
+    implementation 'io.github.ParkSangGwon:tedpermission-normal:3.3.0'
+    implementation 'androidx.cardview:cardview:1.0.0'  // 레이아웃으로 사용할 CardView
+    implementation 'androidx.recyclerview:recyclerview:1.2.1'
+
+    implementation 'androidx.navigation:navigation-fragment:2.1.0'
+    implementation 'androidx.navigation:navigation-ui:2.1.0'
+
+    implementation 'com.squareup.retrofit2:retrofit:2.9.0'
+    implementation 'com.squareup.retrofit2:converter-gson:2.9.0'
+    implementation 'com.squareup.okhttp3:logging-interceptor:4.4.0'
+    implementation 'com.squareup.okhttp3:okhttp-urlconnection:4.9.0'
+
+    implementation 'com.google.android.gms:play-services-maps:18.1.0' // 지도 띄우기
+//    implementation 'com.google.android.gms:play-services-location:21.0.0'  // 현재 위치
+    implementation 'com.google.android.gms:play-services-location:19.0.0' // 현재 위치. 20.0.0 버전부터 변경되기 시작하는 듯....
+    implementation 'com.google.maps.android:android-maps-utils:2.2.0'
+
+
+}
